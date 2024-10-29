@@ -1,0 +1,35 @@
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - shopping
+    volumes:
+      - type: bind
+        source: ./mongo_data
+        target: /data/db
+
+  shopping-ms:
+    build:
+      context: .
+    ports:
+      - "8060:8060"
+    networks:
+      - shopping
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/shoppingdb
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/usr/app
+      - ./.m2:/root/.m2
+
+networks:
+  shopping:
+    name: shopping
+    external: true
+volumes:
+  mongo_data:
